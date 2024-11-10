@@ -45,6 +45,11 @@ export default function HomePage() {
         <button>Post a New Recipe</button>
       </Link>
       </div>
+      <div>
+          <Link href="/recipes/your-recipe">
+            <button>Your-Recipe</button>
+          </Link>
+        </div>
     </div>
   )
 }
