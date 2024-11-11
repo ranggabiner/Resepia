@@ -1,5 +1,4 @@
-// File: /profile/[id]/page.tsx
-'use client';
+'use client'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../../../lib/supabaseClient'
@@ -7,7 +6,10 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const Button = ({ onClick, children, style }: any) => (
-  <button onClick={onClick} style={{ padding: '10px', cursor: 'pointer', ...style }}>
+  <button
+    onClick={onClick}
+    className={`py-2 px-4 rounded-md ${style}`}
+  >
     {children}
   </button>
 )
@@ -78,41 +80,40 @@ const ProfilePage = () => {
     }
   }
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>{error}</div>
-  if (!profile) return <div>No Profile Found</div>
+  if (loading) return <div className="text-center text-gray-600">Loading...</div>
+  if (error) return <div className="text-center text-red-500">{error}</div>
+  if (!profile) return <div className="text-center text-gray-600">No Profile Found</div>
 
   const { first_name, last_name, dob, location } = profile
   const fullName = `${first_name} ${last_name}`
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>{fullName}'s Profile</h1>
-      <p>First Name: {first_name}</p>
-      <p>Last Name: {last_name}</p>
-      <p>Date of Birth: {dob || 'Not Provided'}</p>
-      <p>Location: {location || 'Not Provided'}</p>
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-6">
+      <h1 className="text-2xl font-semibold mb-4">{fullName}'s Profile</h1>
+      
+      <p className="text-gray-700 mb-2"><strong>First Name:</strong> {first_name}</p>
+      <p className="text-gray-700 mb-2"><strong>Last Name:</strong> {last_name}</p>
+      <p className="text-gray-700 mb-2"><strong>Date of Birth:</strong> {dob || 'Not Provided'}</p>
+      <p className="text-gray-700 mb-4"><strong>Location:</strong> {location || 'Not Provided'}</p>
 
-      <div style={{ marginTop: '20px' }}>
-        <Link href={`/`}><Button>Back to Home</Button></Link>
-        <Link href={`/profile/${id}/edit`}><Button>Edit Profile</Button></Link>
+      <div className="space-y-4 mt-6">
+        <Link href={`/`}><Button style="bg-gray-500 text-white hover:bg-gray-600">Back to Home</Button></Link>
+        <Link href={`/profile/${id}/edit`}><Button style="bg-blue-500 text-white hover:bg-blue-600">Edit Profile</Button></Link>
       </div>
 
-      <div style={{ marginTop: '30px' }}>
+      <div className="mt-8">
         {!confirmDelete ? (
-          <Button onClick={() => setConfirmDelete(true)} style={{ backgroundColor: 'red', color: 'white' }}>
+          <Button onClick={() => setConfirmDelete(true)} style="bg-red-500 text-white hover:bg-red-600 w-full mt-4">
             Delete Account
           </Button>
         ) : (
-          <div>
-            <h3 style={{ color: 'red' }}>Are you sure you want to delete your account?</h3>
-            <p>This action is permanent and cannot be undone.</p>
-            <Button onClick={handleDelete} style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}>
-              Yes, Delete
-            </Button>
-            <Button onClick={() => setConfirmDelete(false)} style={{ backgroundColor: 'gray', color: 'white' }}>
-              Cancel
-            </Button>
+          <div className="text-center mt-4">
+            <h3 className="text-red-500 font-semibold">Are you sure you want to delete your account?</h3>
+            <p className="text-gray-600">This action is permanent and cannot be undone.</p>
+            <div className="mt-4 flex justify-center space-x-4">
+              <Button onClick={handleDelete} style="bg-red-500 text-white hover:bg-red-600">Yes, Delete</Button>
+              <Button onClick={() => setConfirmDelete(false)} style="bg-gray-500 text-white hover:bg-gray-600">Cancel</Button>
+            </div>
           </div>
         )}
       </div>
