@@ -35,9 +35,9 @@ export default function RecipeDetailPage() {
         .from("profiles")
         .select("first_name, last_name, username")
         .eq("user_id", userId)
+        .limit(1)
         .single();
-
-      if (profileError) throw profileError;
+      if (profileError) throw new Error(profileError.message);
       setCurrentUserProfile(userProfileData);
 
       // Fetch the recipe data including the user's profile
