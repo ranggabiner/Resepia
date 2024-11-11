@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 export default function AllRecipesPage() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Menambahkan state loading
   const router = useRouter();
 
   useEffect(() => {
@@ -35,10 +36,20 @@ export default function AllRecipesPage() {
       }
 
       setRecipes(data || []);
+      setLoading(false); // Selesai memuat data
     };
 
     fetchRecipes();
   }, []);
+
+  if (loading) {
+    // Tampilkan loading spinner di tengah halaman saat data sedang dimuat
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
