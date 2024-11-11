@@ -36,6 +36,26 @@ export default function UserRecipesPage() {
     fetchUserRecipes();
   }, [router]);
 
+  // Fungsi untuk menghapus resep
+  const handleDeleteRecipe = async (recipeId: string) => {
+    const confirmDelete = confirm('Are you sure you want to delete this recipe?');
+    if (!confirmDelete) return;
+
+    const { error } = await supabase
+      .from('recipes')
+      .delete()
+      .eq('id', recipeId);
+
+    if (error) {
+      console.error('Error deleting recipe:', error.message);
+      alert('Failed to delete the recipe');
+    } else {
+      // Perbarui daftar resep setelah penghapusan berhasil
+      setRecipes(recipes.filter((recipe) => recipe.id !== recipeId));
+      alert('Recipe deleted successfully');
+    }
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
       <h1 className="text-3xl font-bold mb-6">My Recipes</h1>
@@ -48,7 +68,7 @@ export default function UserRecipesPage() {
               <h2 className="text-xl font-semibold mb-2">{recipe.name}</h2>
               <p className="text-gray-700 mb-4">{recipe.description}</p>
 
-              {/* Wrap the image in a div with controlled width and height */}
+              {/* Wrapper for consistent image size */}
               {recipe.image_url && (
                 <div className="w-48 h-48 overflow-hidden mb-4 rounded-lg flex justify-center items-center">
                   <img
@@ -58,13 +78,22 @@ export default function UserRecipesPage() {
                   />
                 </div>
               )}
-              
-              <button
-                onClick={() => router.push(`/recipes/your-recipe/edit?id=${recipe.id}`)}
-                className="mt-auto bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-500 focus:outline-none"
-              >
-                Edit Recipe
-              </button>
+
+              {/* Tombol untuk edit dan delete */}
+              <div className="flex gap-4 mt-auto">
+                <button
+                  onClick={() => router.push(`/recipes/your-recipe/edit?id=${recipe.id}`)}
+                  className="bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-500 focus:outline-none"
+                >
+                  Edit Recipe
+                </button>
+                <button
+                  onClick={() => handleDeleteRecipe(recipe.id)}
+                  className="bg-red-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-red-500 focus:outline-none"
+                >
+                  Delete Recipe
+                </button>
+              </div>
             </div>
           ))}
         </div>
