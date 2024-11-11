@@ -12,6 +12,7 @@ export default function RecipeDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<string | null>(null); // Logged-in user ID
+  const [copySuccess, setCopySuccess] = useState<string | null>(null); // To show feedback for copy action
 
   // Fetch the logged-in user's session and recipe details
   const fetchRecipeDetails = async () => {
@@ -64,6 +65,18 @@ export default function RecipeDetailPage() {
     }
   };
 
+  // Function to copy the recipe link to the clipboard
+  const copyLinkToClipboard = () => {
+    const recipeUrl = `${window.location.origin}/recipes/${id}`;
+    navigator.clipboard.writeText(recipeUrl).then(() => {
+      setCopySuccess("Link copied to clipboard!");
+      setTimeout(() => setCopySuccess(null), 3000); // Clear success message after 3 seconds
+    }).catch((err) => {
+      console.error("Failed to copy link: ", err);
+      setCopySuccess("Failed to copy link.");
+    });
+  };
+
   useEffect(() => {
     fetchRecipeDetails();
   }, [id]);
@@ -89,6 +102,17 @@ export default function RecipeDetailPage() {
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-6">
       <h1 className="text-3xl font-bold mb-6">{recipe?.name}</h1>
       <p className="text-gray-600">{recipe?.description}</p>
+
+      {/* Copy Link Button */}
+      <div className="mt-4 flex items-center space-x-2">
+        <button
+          onClick={copyLinkToClipboard}
+          className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-500 focus:outline-none"
+        >
+          Copy Link
+        </button>
+        {copySuccess && <span className="text-green-600">{copySuccess}</span>}
+      </div>
 
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
