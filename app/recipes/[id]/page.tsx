@@ -19,70 +19,73 @@ export default function RecipeDetailPage() {
   const fetchRecipeDetails = async () => {
     try {
       setLoading(true);
-
+  
       // Fetch the current user session
       const {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
-
+      if (sessionError) throw new Error(sessionError.message);
+  
       const userId = session?.user?.id;
       setCurrentUser(userId);
-
+  
       // Fetch the current user's profile
       const { data: userProfileData, error: profileError } = await supabase
         .from("profiles")
         .select("first_name, last_name, username")
         .eq("user_id", userId)
-        .single();
-
-      if (profileError) throw profileError;
+        .limit(1)  // Use .limit(1) instead of .single()
+        .single(); // Use .single() after .limit(1) for single result handling
+      if (profileError) throw new Error(profileError.message);
       setCurrentUserProfile(userProfileData);
-
-      // Fetch the recipe data including the user's profile
+  
+      // Fetch the recipe data (using .limit(1) for safety)
       const { data: recipeData, error: recipeError } = await supabase
         .from("recipes")
         .select(`*, profiles:user_id (username, first_name, last_name)`)
         .eq("id", id)
-        .single();
-
-      if (recipeError) throw new Error(`Failed to load recipe: ${recipeError.message}`);
-      setRecipe(recipeData);
-
+        .limit(1); // Use .limit(1) here to avoid multiple rows
+      if (recipeError || !recipeData || recipeData.length === 0) {
+        throw new Error("Recipe not found");
+      }
+      setRecipe(recipeData[0]); // Access the first recipe in case of multiple
+      // or handle multiple rows if your app expects that
+  
       // Fetch comments for the recipe
       const { data: commentsData, error: commentsError } = await supabase
         .from("comments")
         .select(
           `
-    *,
-    profiles (username, first_name, last_name)
-  `
+            *,
+            profiles (username, first_name, last_name)
+          `
         )
         .eq("recipe_id", id)
         .order("created_at", { ascending: false });
-
-      if (commentsError) throw new Error(`Failed to load comments: ${commentsError.message}`);
+  
+      if (commentsError) throw new Error(commentsError.message);
       setComments(commentsData || []);
-
-      // Fetch user's review for the recipe (corrected table name)
+  
+      // Fetch user's review for the recipe
       const { data: userReviewData, error: reviewError } = await supabase
-        .from("recipe_ratings")  // Corrected to 'recipe_ratings' table
+        .from("recipe_ratings")
         .select("*")
         .eq("user_id", userId)
         .eq("recipe_id", id)
-        .single();
-
-      if (reviewError) throw reviewError;
-      setUserReview(userReviewData);
-
+        .limit(1); // Ensure it handles only one review per user
+      if (reviewError) throw new Error(reviewError.message);
+      setUserReview(userReviewData && userReviewData.length > 0 ? userReviewData[0] : null);
+  
     } catch (error) {
-      setError((error as Error).message || "An unexpected error occurred");
-      console.error("Fetch error:", error);
+      const errorMessage = (error as Error).message || "An unexpected error occurred";
+      setError(errorMessage);
+      console.error("Fetch error:", errorMessage);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
