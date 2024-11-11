@@ -6,26 +6,32 @@ import { supabase } from "../../../lib/supabaseClient";
 
 export default function RecipeDetailPage() {
   const router = useRouter();
-  const { id } = useParams(); // Ambil ID resep dari query parameter URL
+  const { id } = useParams(); // Recipe ID from URL params
   const [recipe, setRecipe] = useState<any | null>(null);
-  const [existingReview, setExistingReview] = useState<any | null>(null); // Untuk data rating dan review yang sudah ada
-  const [loading, setLoading] = useState(true); // Untuk menandakan bahwa data sedang dimuat
+  const [existingReview, setExistingReview] = useState<any | null>(null); // User's own review, if it exists
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [validating, setValidating] = useState<boolean>(true); // Menambahkan status validasi
+  const [currentUser, setCurrentUser] = useState<string | null>(null); // Logged-in user ID
 
-  // Ambil detail resep dan cek review pengguna
+  // Fetch the logged-in user's session and recipe details
   const fetchRecipeDetails = async () => {
-    if (!id) {
-      setError("Recipe ID is missing");
-      setLoading(false);
-      setValidating(false); // Validasi selesai
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      // Ambil detail resep berdasarkan ID
+      setLoading(true);
+
+      // Fetch session data to identify the logged-in user
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const userId = session?.user?.id;
+      if (!userId) {
+        setError("User is not logged in");
+        setLoading(false);
+        return;
+      }
+      setCurrentUser(userId);
+
+      // Fetch the recipe details by recipe ID
       const { data: recipeData, error: recipeError } = await supabase
         .from("recipes")
         .select(`*, profiles:user_id (username, first_name, last_name)`)
@@ -38,23 +44,23 @@ export default function RecipeDetailPage() {
 
       setRecipe(recipeData);
 
-      // Cek apakah sudah ada rating dan review oleh pengguna
-      const { data: reviewData, error: reviewError } = await supabase
+      // Fetch the user's own review for this recipe
+      const { data: userReview, error: reviewError } = await supabase
         .from("recipe_ratings")
         .select("rating, review")
         .eq("recipe_id", id)
-        .single();  // Ambil hanya satu data review
+        .eq("user_id", userId) // Filter by logged-in user ID
+        .single(); // Expect only one review per user per recipe
 
       if (reviewError) {
-        setExistingReview(null); // Tidak ada review
+        setExistingReview(null); // No review by this user
       } else {
-        setExistingReview(reviewData);
+        setExistingReview(userReview); // Set the user's review, if it exists
       }
     } catch (error) {
       setError((error as Error).message);
     } finally {
       setLoading(false);
-      setValidating(false); // Validasi selesai
     }
   };
 
@@ -62,8 +68,7 @@ export default function RecipeDetailPage() {
     fetchRecipeDetails();
   }, [id]);
 
-  // Jika masih dalam proses validasi atau loading, tampilkan loading spinner
-  if (validating) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
@@ -71,10 +76,9 @@ export default function RecipeDetailPage() {
     );
   }
 
-  if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
-  // Check if ingredients is a string and split it if possible
+  // Split ingredients if stored as a single string
   const ingredientsList = Array.isArray(recipe?.ingredients)
     ? recipe?.ingredients
     : typeof recipe?.ingredients === 'string'
