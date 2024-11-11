@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 
 export default function AllRecipesPage() {
   const [recipes, setRecipes] = useState<any[]>([]);
+  const [filteredRecipes, setFilteredRecipes] = useState<any[]>([]); // State for filtered recipes
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Menambahkan state loading
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>(''); // State for search input
   const router = useRouter();
 
   useEffect(() => {
@@ -36,14 +38,22 @@ export default function AllRecipesPage() {
       }
 
       setRecipes(data || []);
-      setLoading(false); // Selesai memuat data
+      setFilteredRecipes(data || []); // Set initial filtered recipes
+      setLoading(false);
     };
 
     fetchRecipes();
   }, []);
 
+  // Filter recipes based on search query
+  useEffect(() => {
+    const filtered = recipes.filter(recipe =>
+      recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredRecipes(filtered);
+  }, [searchQuery, recipes]);
+
   if (loading) {
-    // Tampilkan loading spinner di tengah halaman saat data sedang dimuat
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
@@ -54,11 +64,21 @@ export default function AllRecipesPage() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
       <h1 className="text-3xl font-bold mb-6">All Recipes</h1>
-      {recipes.length === 0 ? (
-        <p className="text-gray-600">No recipes available at the moment.</p>
+      
+      {/* Search bar for filtering recipes by name */}
+      <input
+        type="text"
+        placeholder="Search recipes by name..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="mb-6 p-3 w-full max-w-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+      />
+
+      {filteredRecipes.length === 0 ? (
+        <p className="text-gray-600">No recipes found for "{searchQuery}".</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
-          {recipes.map((recipe) => (
+          {filteredRecipes.map((recipe) => (
             <div
               key={recipe.id}
               className={`bg-white rounded-lg shadow-md p-6 flex flex-col items-start ${recipe.user_id === currentUser ? 'border border-indigo-600' : ''}`}
@@ -66,7 +86,7 @@ export default function AllRecipesPage() {
               <h2 className="text-xl font-semibold mb-2">{recipe.name}</h2>
               <p className="text-gray-700 mb-4">{recipe.description}</p>
 
-              {/* Display the recipe image with fixed dimensions */}
+              {/* Display the recipe image */}
               {recipe.image_url && (
                 <div className="w-48 h-48 overflow-hidden mb-4 rounded-lg flex justify-center items-center">
                   <img
