@@ -9,7 +9,7 @@ export default function LogInButton() {
     <>
       <div
         onClick={() => setIsAuthModalOpen(true)}
-        className="w-[98px] h-10 px-[25.50px] pt-[7.50px] pb-[8.50px] bg-[#111111] rounded-lg border border-[#111111] justify-center items-center inline-flex cursor-pointer hover:bg-gray-800">
+        className="w-[98px] h-10 px-[25.50px] pt-[7.50px] pb-[8.50px] bg-[#182000] rounded-lg justify-center items-center inline-flex cursor-pointer hover:bg-gray-800">
         <div className="text-center text-white text-base font-normal">Log In</div>
       </div>
 

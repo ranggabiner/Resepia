@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
+import RecipeCard from '../components/recipes/RecipeCard'; // Import komponen RecipeCard
+import Navbar from '../components/Navbar'; // Import Navbar komponen
 
 export default function AllRecipesPage() {
   const [recipes, setRecipes] = useState<any[]>([]);
@@ -62,60 +64,29 @@ export default function AllRecipesPage() {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
-      <h1 className="text-3xl font-bold mb-6">All Recipes</h1>
+    <div className="flex flex-col items-center min-h-screen bg-[#faffec] pb-8">
+      {/* Include Navbar at the top of the page */}
+      <Navbar />
       
+      <h1 className="text-3xl font-bold mt-6 mb-3">Simple and Tasty Recipes</h1>
+      <h1 className="text-gray-500 text-lg w-3/4 text-center mb-6">Savor easy-to-make dishes that are full of flavor, perfect for every special moment.</h1>
+
       {/* Search bar for filtering recipes by name */}
       <input
         type="text"
-        placeholder="Search recipes by name..."
+        placeholder="Search recipes by name"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-6 p-3 w-full max-w-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+        className="mb-8 p-3 w-full max-w-lg border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3d5300]"
       />
 
       {filteredRecipes.length === 0 ? (
         <p className="text-gray-600">No recipes found for "{searchQuery}".</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
+        // Grid container for cards with spacing between them
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
           {filteredRecipes.map((recipe) => (
-            <div
-              key={recipe.id}
-              className={`bg-white rounded-lg shadow-md p-6 flex flex-col items-start ${recipe.user_id === currentUser ? 'border border-indigo-600' : ''}`}
-            >
-              <h2 className="text-xl font-semibold mb-2">{recipe.name}</h2>
-              <p className="text-gray-700 mb-4">{recipe.description}</p>
-
-              {/* Display the recipe image */}
-              {recipe.image_url && (
-                <div className="w-48 h-48 overflow-hidden mb-4 rounded-lg flex justify-center items-center">
-                  <img
-                    src={recipe.image_url}
-                    alt={recipe.name}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              )}
-
-              {/* Display the creator's name */}
-              {recipe.profiles && (
-                <p className="text-sm text-gray-500 mb-2">
-                  Created by: <span className="font-semibold">{recipe.profiles.username || `${recipe.profiles.first_name} ${recipe.profiles.last_name}`}</span>
-                </p>
-              )}
-
-              <button
-                onClick={() => router.push(`/recipes/${recipe.id}`)}
-                className="mt-auto bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-500 focus:outline-none"
-              >
-                View Recipe
-              </button>
-
-              {/* Display 'Your Recipe' tag if the recipe belongs to the logged-in user */}
-              {recipe.user_id === currentUser && (
-                <span className="mt-2 text-indigo-600 font-semibold">Your Recipe</span>
-              )}
-            </div>
+            <RecipeCard key={recipe.id} recipe={recipe} currentUser={currentUser} />
           ))}
         </div>
       )}
