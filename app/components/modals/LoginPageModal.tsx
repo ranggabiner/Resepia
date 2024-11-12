@@ -1,4 +1,3 @@
-// components/modals/LoginPageModal.tsx
 import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -40,7 +39,7 @@ export default function LoginPageModal({ isOpen, setIsOpen, toggleModal }: Login
     setLoading(false);
   };
 
-  // Tambahkan fungsi handleGoogleLogin
+  // Google login handler
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
