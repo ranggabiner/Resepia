@@ -1,8 +1,10 @@
+// components/pages/RecipeDetailPage.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
+import LoadingCircle from "../../components/LoadingCircle";
 
 export default function RecipeDetailPage() {
   const router = useRouter();
@@ -37,32 +39,26 @@ export default function RecipeDetailPage() {
         .from("profiles")
         .select("first_name, last_name, username")
         .eq("user_id", userId)
-        .limit(1) // Use .limit(1) instead of .single()
-        .single(); // Use .single() after .limit(1) for single result handling
+        .limit(1)
+        .single();
       if (profileError) throw new Error(profileError.message);
       setCurrentUserProfile(userProfileData);
 
-      // Fetch the recipe data (using .limit(1) for safety)
+      // Fetch the recipe data
       const { data: recipeData, error: recipeError } = await supabase
         .from("recipes")
         .select(`*, profiles:user_id (username, first_name, last_name)`)
         .eq("id", id)
-        .limit(1); // Use .limit(1) here to avoid multiple rows
+        .limit(1);
       if (recipeError || !recipeData || recipeData.length === 0) {
         throw new Error("Recipe not found");
       }
-      setRecipe(recipeData[0]); // Access the first recipe in case of multiple
-      // or handle multiple rows if your app expects that
+      setRecipe(recipeData[0]);
 
       // Fetch comments for the recipe
       const { data: commentsData, error: commentsError } = await supabase
         .from("comments")
-        .select(
-          `
-            *,
-            profiles (username, first_name, last_name)
-          `
-        )
+        .select(`*, profiles (username, first_name, last_name)`)
         .eq("recipe_id", id)
         .order("created_at", { ascending: false });
 
@@ -75,7 +71,7 @@ export default function RecipeDetailPage() {
         .select("*")
         .eq("user_id", userId)
         .eq("recipe_id", id)
-        .limit(1); // Ensure it handles only one review per user
+        .limit(1);
       if (reviewError) throw new Error(reviewError.message);
       setUserReview(
         userReviewData && userReviewData.length > 0 ? userReviewData[0] : null
@@ -129,7 +125,6 @@ export default function RecipeDetailPage() {
   useEffect(() => {
     fetchRecipeDetails();
 
-    // Corrected Realtime subscription using supabase.channel
     const commentSubscription = supabase
       .channel(`public:comments`)
       .on(
@@ -154,11 +149,7 @@ export default function RecipeDetailPage() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingCircle />; // Menggunakan komponen LoadingCircle
   }
 
   if (error) return <p>Error: {error}</p>;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../../lib/supabaseClient";
+import LoadingCircle from "../../components/LoadingCircle"; // Import LoadingCircle component
 
 export default function RateReviewPage() {
   const router = useRouter();
@@ -48,13 +49,9 @@ export default function RateReviewPage() {
     checkReview();
   }, [id]);
 
-  // Jika sedang dalam proses validasi, tampilkan loading
+  // Jika sedang dalam proses validasi, tampilkan loading menggunakan komponen LoadingCircle
   if (validating) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingCircle />;
   }
 
   // Jika sudah ada review, tampilkan pesan
