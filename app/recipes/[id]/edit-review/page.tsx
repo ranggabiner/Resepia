@@ -1,8 +1,10 @@
+// EditReviewPage.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../../lib/supabaseClient";
+import LoadingCircle from "../../../components/LoadingCircle"; // Import LoadingCircle component
 
 export default function EditReviewPage() {
   const router = useRouter();
@@ -104,13 +106,9 @@ export default function EditReviewPage() {
     }
   };
 
-  // Jika validasi masih berlangsung, tampilkan hanya loading spinner
+  // Jika validasi masih berlangsung, tampilkan komponen LoadingCircle
   if (validating) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingCircle />;
   }
 
   return (
