@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
+import ChatBot from '../../components/ChatBot'; 
 import LoadingCircle from "../../components/LoadingCircle";
 
 export default function RecipeDetailPage() {
@@ -19,6 +20,7 @@ export default function RecipeDetailPage() {
     null
   );
   const [userReview, setUserReview] = useState<any | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const fetchRecipeDetails = async () => {
     try {
@@ -245,6 +247,29 @@ export default function RecipeDetailPage() {
           </div>
         ))}
       </div>
-    </div>
+             
+      {/* Add ChatBot button and component */} 
+      <button
+        onClick={() => setIsChatOpen(!isChatOpen)}
+        className="fixed bottom-4 right-4 bg-indigo-600 text-white rounded-full p-4 shadow-lg hover:bg-indigo-700 transition-colors"
+      >
+        {isChatOpen ? (
+          <span className="text-xl">✕</span>
+        ) : (
+          <span className="text-xl">💬</span>
+        )}
+      </button>
+      
+      <ChatBot 
+      isOpen={isChatOpen} 
+      onClose={() => setIsChatOpen(false)}
+      recipeContext={{
+        name: recipe?.name,
+        description: recipe?.description,
+        ingredients: recipe?.ingredients,
+        steps: recipe?.steps
+      }}
+    />
+      </div>
   );
 }

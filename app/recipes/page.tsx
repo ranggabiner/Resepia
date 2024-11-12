@@ -64,7 +64,6 @@ export default function AllRecipesPage() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 py-8">
       <h1 className="text-3xl font-bold mb-6">All Recipes</h1>
-      
       {/* Search bar for filtering recipes by name */}
       <input
         type="text"
