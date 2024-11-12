@@ -269,10 +269,9 @@ export default function RecipeDetailPage() {
       </button>
       
       <ChatBot 
-      isOpen={isChatOpen} 
-      onClose={() => setIsChatOpen(false)}
-      apiKey="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"
-    />
+        isOpen={isChatOpen} 
+        onClose={() => setIsChatOpen(false)}
+      />
     </div>
   );
 }

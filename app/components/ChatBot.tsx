@@ -17,7 +17,6 @@ interface OpenAIMessage {
 interface ChatBotProps {
   isOpen: boolean;
   onClose: () => void;
-  apiKey: string;
 }
 
 const INITIAL_MESSAGE: ChatMessage = {
@@ -32,7 +31,7 @@ const SYSTEM_PROMPT: OpenAIMessage = {
   content: 'Saya adalah asisten resep yang siap membantu. Saya dapat memberikan tips memasak, saran resep, dan menjawab pertanyaan seputar memasak dan persiapan makanan.'
 };
 
-const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose, apiKey }) => {
+const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -83,17 +82,13 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose, apiKey }) => {
     setMessages(prev => [...prev, loadingMessage]);
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4-turbo-preview',
           messages: formatMessagesForAPI([...messages, userMessage]),
-          max_tokens: 500,
-          temperature: 0.7,
         })
       });
 
