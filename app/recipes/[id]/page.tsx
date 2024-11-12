@@ -256,8 +256,9 @@ export default function RecipeDetailPage() {
           </div>
         ))}
       </div>
-             {/* Add ChatBot button and component */}
-             <button
+             
+      {/* Add ChatBot button and component */} 
+      <button
         onClick={() => setIsChatOpen(!isChatOpen)}
         className="fixed bottom-4 right-4 bg-indigo-600 text-white rounded-full p-4 shadow-lg hover:bg-indigo-700 transition-colors"
       >
@@ -269,9 +270,15 @@ export default function RecipeDetailPage() {
       </button>
       
       <ChatBot 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)}
-      />
-    </div>
+      isOpen={isChatOpen} 
+      onClose={() => setIsChatOpen(false)}
+      recipeContext={{
+        name: recipe?.name,
+        description: recipe?.description,
+        ingredients: recipe?.ingredients,
+        steps: recipe?.steps
+      }}
+    />
+      </div>
   );
 }

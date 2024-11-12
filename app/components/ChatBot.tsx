@@ -17,22 +17,25 @@ interface OpenAIMessage {
 interface ChatBotProps {
   isOpen: boolean;
   onClose: () => void;
+  recipeContext?: {
+    name: string;
+    description: string;
+    ingredients: string[];
+    steps: string[];
+  };
 }
 
-const INITIAL_MESSAGE: ChatMessage = {
+const getInitialMessage = (recipeName: string): ChatMessage => ({
   id: 0,
-  text: "Hi! Saya adalah resepia. tanyakan apa saja terkait resep ini, saya akan menjawabnya!",
+  text: `Hi! Saya adalah resepia. Saya siap membantu Anda dengan resep ${recipeName}. Silakan tanyakan apa saja terkait resep ini!`,
   isBot: true,
   role: 'system'
-};
+});
 
-const SYSTEM_PROMPT: OpenAIMessage = {
-  role: 'system',
-  content: 'Saya adalah asisten resep yang siap membantu. Saya dapat memberikan tips memasak, saran resep, dan menjawab pertanyaan seputar memasak dan persiapan makanan.'
-};
-
-const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
+const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose, recipeContext }) => {
+  const [messages, setMessages] = useState<ChatMessage[]>(() => 
+    [getInitialMessage(recipeContext?.name || 'ini')]
+  );
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,6 +47,23 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const SYSTEM_PROMPT: OpenAIMessage = {
+    role: 'system',
+    content: `Saya adalah asisten resep yang dapat membantu hal-hal seputar resep makanan. 
+  
+  Saya akan merespons pertanyaan tentang resep makanan.
+  
+  Untuk resep ${recipeContext?.name || ''}: 
+  Deskripsi: ${recipeContext?.description || ''}
+  
+  Bahan-bahan:
+  ${recipeContext?.ingredients?.join('\n') || ''}
+  
+  Langkah-langkah:
+  ${recipeContext?.steps?.join('\n') || ''}  
+`
+  };
 
   const formatMessagesForAPI = (messages: ChatMessage[]): OpenAIMessage[] => {
     return [
