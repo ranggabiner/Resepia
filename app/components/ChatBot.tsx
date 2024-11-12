@@ -50,9 +50,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose, recipeContext }) => 
 
   const SYSTEM_PROMPT: OpenAIMessage = {
     role: 'system',
-    content: `Saya adalah asisten resep yang dapat membantu hal-hal seputar resep makanan. 
+    content: `Saya adalah asisten resep yang dapat membantu hal-hal seputar resep makanan dan sebagainya. 
   
-  Saya akan merespons pertanyaan tentang resep makanan.
+  Saya akan merespons pertanyaan tentang:
   
   Untuk resep ${recipeContext?.name || ''}: 
   Deskripsi: ${recipeContext?.description || ''}
@@ -62,7 +62,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose, recipeContext }) => 
   
   Langkah-langkah:
   ${recipeContext?.steps?.join('\n') || ''}  
-`
+
+  saya tidak akan merespons pertanyaan yang tidak berhubungan dengan resep.`
   };
 
   const formatMessagesForAPI = (messages: ChatMessage[]): OpenAIMessage[] => {
@@ -154,7 +155,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onClose, recipeContext }) => 
   return (
     <div className="fixed bottom-20 right-4 w-80 bg-white rounded-lg shadow-xl z-50">
       <div className="flex justify-between items-center p-4 border-b">
-        <h3 className="font-semibold">Cooking Assistant</h3>
+        <h3 className="font-semibold">Resepia Intelligent</h3>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           ✕
         </button>
