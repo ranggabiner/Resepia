@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../../lib/supabaseClient";
-import LoadingCircle from "../../components/LoadingCircle"; // Import LoadingCircle component
+import LoadingCircle from "../../../components/LoadingCircle"; // Import LoadingCircle component
 
 export default function RateReviewPage() {
   const router = useRouter();
