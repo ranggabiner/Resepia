@@ -42,29 +42,29 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="w-full bg-[#3d5300] text-white py-4 px-8 flex justify-between items-center">
-        <div className="text-2xl font-bold">
+      <nav className="w-full h-[75px] bg-[#FFCDCD] text-white py-4 px-8 flex justify-between items-center">
+        <div className="text-2xl font-bold text-[#997b7b]">
           <Link href="/">Resepia</Link>
         </div>
 
-        <div className="flex space-x-4">
+        <div className="flex space-x-10 text-lg text-black">
           <Link
             href="/recipes"
-            className="hover:underline"
+            className="hover:underline duration-300 transition-all hover:text-[#997b7b]"
             onClick={(e) => handleNavigation(e, "/recipes")}
           >
             Recipes
           </Link>
           <Link
             href="/"
-            className="hover:underline"
+            className="hover:underline duration-300 transition-all hover:text-[#997b7b]"
             onClick={(e) => handleNavigation(e, "/contact")}
           >
             Contact
           </Link>
           <Link
             href="/recipes"
-            className="hover:underline"
+            className="hover:underline duration-300 transition-all hover:text-[#997b7b]"
             onClick={(e) => handleNavigation(e, "/about")}
           >
             About
@@ -72,14 +72,14 @@ export default function Navbar() {
           {/* Add Subscription link if needed */}
           <Link
             href="/subscription"
-            className="hover:underline"
+            className="hover:underline duration-300 transition-all hover:text-[#997b7b]"
             onClick={(e) => handleNavigation(e, "/subscription")}
           >
             Subscription
           </Link>
 
           {user && (
-            <Link href={`/profile/${user.id}`} className="hover:underline">
+            <Link href={`/profile/${user.id}`} className="hover:underline duration-300 transition-all hover:text-[#997b7b]">
               Profile
             </Link>
           )}
