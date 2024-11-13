@@ -5,14 +5,17 @@ import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import RecipeCard from '../components/recipes/RecipeCard'; // Import komponen RecipeCard
 import Navbar from '../components/Navbar'; // Import Navbar komponen
+import LoadingCircle from '../components/LoadingCircle'; // Import the LoadingCircle component
 
 export default function AllRecipesPage() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [filteredRecipes, setFilteredRecipes] = useState<any[]>([]); // State for filtered recipes
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>(''); // State for search input
   const router = useRouter();
+
+  // Flag to indicate loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -41,7 +44,7 @@ export default function AllRecipesPage() {
 
       setRecipes(data || []);
       setFilteredRecipes(data || []); // Set initial filtered recipes
-      setLoading(false);
+      setIsLoading(false);
     };
 
     fetchRecipes();
@@ -55,21 +58,15 @@ export default function AllRecipesPage() {
     setFilteredRecipes(filtered);
   }, [searchQuery, recipes]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-16 h-16 border-4 border-t-4 border-indigo-600 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col items-center min-h-screen bg-[#faffec] pb-8">
+    <div className="flex flex-col items-center min-h-screen bg-[#FFE6E6] pb-8">
       {/* Include Navbar at the top of the page */}
       <Navbar />
-      
+
       <h1 className="text-3xl font-bold mt-6 mb-3">Simple and Tasty Recipes</h1>
-      <h1 className="text-gray-500 text-lg w-3/4 text-center mb-6">Savor easy-to-make dishes that are full of flavor, perfect for every special moment.</h1>
+      <h1 className="text-gray-500 text-lg w-3/4 text-center mb-6">
+        Savor easy-to-make dishes that are full of flavor, perfect for every special moment.
+      </h1>
 
       {/* Search bar for filtering recipes by name */}
       <input
@@ -77,18 +74,24 @@ export default function AllRecipesPage() {
         placeholder="Search recipes by name"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-8 p-3 w-full max-w-lg border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3d5300]"
+        className="mb-8 p-3 w-full max-w-lg border border-[#cca4a4] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#997b7b]"
       />
 
-      {filteredRecipes.length === 0 ? (
-        <p className="text-gray-600">No recipes found for "{searchQuery}".</p>
+      {isLoading ? (
+        <LoadingCircle /> // Render the LoadingCircle component while data is fetching
       ) : (
-        // Grid container for cards with spacing between them
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-          {filteredRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} currentUser={currentUser} />
-          ))}
-        </div>
+        <>
+          {filteredRecipes.length === 0 ? (
+            <p className="text-gray-600">No recipes found for "{searchQuery}".</p>
+          ) : (
+            // Grid container for cards with spacing between them
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+              {filteredRecipes.map((recipe) => (
+                <RecipeCard key={recipe.id} recipe={recipe} currentUser={currentUser} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Navbar from './components/Navbar';
+import Hero from './components/CarouselCard';
+import Carousel from './components/Carousel';
+import CarouselCard from './components/CarouselCard';
 
 export default function HomePage() {
   const [user, setUser] = useState<any>(null);
@@ -22,10 +25,13 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center bg-[#FFE6E6]">
       <Navbar />  {/* Add Navbar here */}
-      <main className="flex flex-col items-center justify-center py-16 px-4 w-full max-w-4xl text-center">
-      </main>
+      <Carousel interval={5000}>
+        <CarouselCard />
+        <CarouselCard />
+        <CarouselCard />
+      </Carousel>
     </div>
   );
 }
